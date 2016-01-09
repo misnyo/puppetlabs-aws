@@ -206,11 +206,15 @@ Puppet::Type.type(:elb_loadbalancer).provide(:v2, :parent => PuppetX::Puppetlabs
   end
 
   def vpc_id_from_subnet_name(name)
-    response = ec2_client(resource[:region]).describe_subnets(filters: [
-      {name: 'tag:Name', values: [name]}
-    ])
-    fail("No subnet with name #{name}") if response.data.subnets.empty?
-    response.data.subnets.map(&:vpc_id).first
+    unless name.nil?
+      response = ec2_client(resource[:region]).describe_subnets(filters: [
+        {name: 'tag:Name', values: [name]}
+      ])
+      fail("No subnet with name #{name}") if response.data.subnets.empty?
+      response.data.subnets.map(&:vpc_id).first
+    else
+      nil
+    end
   end
 
   def subnet_ids_from_names(names)
